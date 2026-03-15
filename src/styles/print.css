@@ -1,0 +1,46 @@
+/* Print styles for 80mm thermal receipt */
+
+@page {
+  size: 80mm auto;
+  margin: 0;
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .no-print { display: none !important; }
+}
+
+.receipt-root {
+  width: 80mm;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #ffffff;
+  color: #000000;
+  padding: 8px 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.receipt-center { text-align: center; }
+.receipt-row { display: flex; justify-content: space-between; gap: 8px; }
+.receipt-hr { border: 0; border-top: 1px dashed #000; margin: 8px 0; }
+.receipt-title { font-weight: 700; font-size: 14px; }
+.receipt-muted { opacity: 0.9; }
+.receipt-small { font-size: 11px; }
+
+/* Table-like items */
+.items { width: 100%; }
+.items .item { display: grid; grid-template-columns: 1fr 24px 40px 48px; gap: 6px; }
+.items .item .num { text-align: right; }
+
+.total-row { display: flex; justify-content: space-between; font-weight: 700; margin-top: 8px; }
+
+/* Hidden on screen, visible only during print */
+.no-screen { display: none; }
+@media print {
+  .no-screen { display: block !important; }
+}
