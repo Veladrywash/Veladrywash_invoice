@@ -47,6 +47,15 @@ export function disconnectPrinter(): void {
 
 export async function connectPrinter(): Promise<string> {
   if (!navigator.bluetooth) {
+    const nav = navigator as any;
+    const isBrave = typeof nav.brave?.isBrave === 'function' && (await nav.brave.isBrave());
+
+    if (isBrave) {
+      throw new Error(
+        'Web Bluetooth is disabled in Brave by default. Please go to `brave://flags`, search for "Web Bluetooth API", set it to "Enabled", and relaunch the browser.'
+      );
+    }
+
     throw new Error(
       'Web Bluetooth is not supported in this browser. Please use Chrome or Edge.'
     );

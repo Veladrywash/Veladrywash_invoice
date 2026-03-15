@@ -16,6 +16,7 @@ import { localDb } from '@/db/localDb';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Bluetooth, BluetoothOff, BluetoothSearching, Trash2, PrinterIcon, Pencil, Check, X, Plus } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useBluetooth } from '@/hooks/use-bluetooth';
 
 const SuggestionsManager = ({
   title,
@@ -186,7 +187,7 @@ export default function Settings() {
   const [printerConnected, setPrinterConnected] = useState(() => isPrinterConnected());
   const [printerName, setPrinterName] = useState(() => getConnectedPrinterName());
   const [printerError, setPrinterError] = useState('');
-  const hasBluetooth = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+  const { hasBluetooth, isBrave } = useBluetooth();
 
   const handleConnect = async () => {
     setPrinterError('');
@@ -399,10 +400,19 @@ export default function Settings() {
           </CardHeader>
           <CardContent className="space-y-4">
             {!hasBluetooth ? (
-              <p className="text-sm text-amber-600 font-medium flex items-center gap-2">
-                <BluetoothOff className="w-4 h-4" />
-                ⚠️ Bluetooth requires Chrome or Edge browser.
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-amber-600 font-medium flex items-center gap-2">
+                  <BluetoothOff className="w-4 h-4" />
+                  {isBrave 
+                    ? '⚠️ Web Bluetooth is disabled in Brave by default.' 
+                    : '⚠️ Web Bluetooth requires Chrome, Edge, or an enabled browser.'}
+                </p>
+                {isBrave && (
+                  <p className="text-sm text-muted-foreground">
+                    Please go to <code className="bg-muted p-1 rounded">brave://flags</code>, search for <strong>"Web Bluetooth API"</strong>, set it to <strong>"Enabled"</strong>, and relaunch Brave.
+                  </p>
+                )}
+              </div>
             ) : (
               <>
                 {printerConnected ? (

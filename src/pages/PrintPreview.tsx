@@ -15,6 +15,7 @@ import {
 } from '@/utils/bluetoothPrinter';
 import { Bluetooth, BluetoothOff, BluetoothSearching } from 'lucide-react';
 import { toast } from 'sonner';
+import { useBluetooth } from '@/hooks/use-bluetooth';
 
 export default function PrintPreview() {
   const { id } = useParams();
@@ -29,7 +30,7 @@ export default function PrintPreview() {
   const [printerName, setPrinterName] = useState(() => getConnectedPrinterName());
   const [printerError, setPrinterError] = useState('');
 
-  const hasBluetooth = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+  const { hasBluetooth } = useBluetooth();
 
 
 

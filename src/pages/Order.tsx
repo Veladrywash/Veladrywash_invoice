@@ -15,6 +15,7 @@ import { printReceiptBLE, isPrinterConnected, connectPrinter, disconnectPrinter,
 import { toast } from 'sonner';
 import { Bluetooth, BluetoothOff, BluetoothSearching } from 'lucide-react';
 import { localDb } from '@/db/localDb';
+import { useBluetooth } from '@/hooks/use-bluetooth';
 
 function getTodayDate() {
   return new Date().toISOString().split('T')[0];
@@ -34,7 +35,7 @@ export default function OrderPage() {
   const [printerConnected, setPrinterConnected] = useState(() => isPrinterConnected());
   const [printerName, setPrinterName] = useState(() => getConnectedPrinterName());
   const [printerError, setPrinterError] = useState('');
-  const hasBluetooth = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+  const { hasBluetooth, isBrave } = useBluetooth();
 
   const handleConnect = async () => {
     setPrinterError('');
@@ -242,7 +243,9 @@ export default function OrderPage() {
         {!hasBluetooth ? (
           <p className="text-sm text-amber-600 font-medium flex items-center gap-2">
             <BluetoothOff className="w-4 h-4" />
-            ⚠️ Bluetooth printing requires Chrome or Edge browser
+            {isBrave 
+              ? '⚠️ Web Bluetooth is disabled in Brave. Enable it in flags.' 
+              : '⚠️ Bluetooth printing requires Chrome or Edge browser'}
           </p>
         ) : (
           <>

@@ -22,6 +22,7 @@ import {
   printReceiptBLE,
 } from '@/utils/bluetoothPrinter';
 import { toast } from 'sonner';
+import { useBluetooth } from '@/hooks/use-bluetooth';
 
 
 type FilterPeriod = 'today' | 'yesterday' | 'week' | 'month' | 'all';
@@ -95,7 +96,7 @@ export default function Dashboard() {
   const [printerConnected, setPrinterConnected] = useState(() => isPrinterConnected());
   const [printerName, setPrinterName] = useState(() => getConnectedPrinterName());
   const [printerError, setPrinterError] = useState('');
-  const hasBluetooth = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+  const { hasBluetooth, isBrave } = useBluetooth();
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isStandalone, setIsStandalone] = useState(false);
@@ -255,7 +256,9 @@ export default function Dashboard() {
         {!hasBluetooth ? (
           <p className="text-sm text-amber-600 font-medium flex items-center gap-2">
             <BluetoothOff className="w-4 h-4" />
-            ⚠️ Bluetooth printing requires Chrome or Edge browser
+            {isBrave 
+              ? '⚠️ Web Bluetooth is disabled in Brave. Enable it in flags.' 
+              : '⚠️ Bluetooth printing requires Chrome or Edge browser'}
           </p>
         ) : (
           <>
