@@ -11,19 +11,18 @@ export function NavBar() {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstall = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setIsInstallable(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstallable(false);
+      setIsStandalone(true);
     }
 
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -31,13 +30,12 @@ export function NavBar() {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      toast.info('To install, click the "App/Install" icon in your browser search address bar, or use the menu toolbar options setups setup framing.');
+      toast.info('To install, click target App/Install icon in your browser search address bar setups setup framing.');
       return;
     }
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') {
-      setIsInstallable(false);
       setDeferredPrompt(null);
     }
   };
@@ -101,7 +99,7 @@ export function NavBar() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {!isMobile && isInstallable && (
+          {!isMobile && !isStandalone && (
             <Button
               variant="default"
               size="sm"
@@ -137,7 +135,7 @@ export function NavBar() {
       {isMobile && menuOpen && (
         <div className="border-t bg-background px-4 py-3 flex flex-col gap-3 shadow-lg">
           {navLinks}
-          {isInstallable && (
+          {!isStandalone && (
             <Button variant="default" size="sm" onClick={handleInstallClick} className="w-full mt-2">
               <Download className="w-4 h-4 mr-2" />
               Install Web App

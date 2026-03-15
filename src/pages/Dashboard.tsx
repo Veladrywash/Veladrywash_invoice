@@ -13,7 +13,7 @@ import { OfflineBanner } from '@/components/OfflineBanner';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Bluetooth, BluetoothOff, BluetoothSearching, Printer } from 'lucide-react';
+import { Bluetooth, BluetoothOff, BluetoothSearching, Printer, Download } from 'lucide-react';
 import {
   connectPrinter,
   disconnectPrinter,
@@ -97,6 +97,35 @@ export default function Dashboard() {
   const [printerError, setPrinterError] = useState('');
   const hasBluetooth = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
 
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsStandalone(true);
+    }
+
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      toast.info('To install, click target "Download" or "App" icon in your browser address row address bar, or use browser menu layouts framing configurations set setup framing setups.');
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
   const handleConnect = async () => {
     setPrinterError('');
     setIsConnecting(true);
@@ -255,6 +284,20 @@ export default function Dashboard() {
       </div>
 
       <section className="container py-6 pb-12 space-y-4">
+        {!isStandalone && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm no-print">
+            <div className="flex items-start md:items-center gap-3">
+              <Download className="w-6 h-6 text-blue-600" />
+              <div>
+                <h4 className="font-semibold text-blue-900">Install full app for offline use</h4>
+                <p className="text-sm text-blue-700">Access Vela Dry Wash POS faster and even without internet setups.</p>
+              </div>
+            </div>
+            <Button onClick={handleInstallClick} className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white">
+              Install App
+            </Button>
+          </div>
+        )}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <h1 className="text-2xl md:text-3xl font-bold">
             All Orders ({filteredOrders.length}{filter !== 'all' ? ` / ${orders.length}` : ''})
